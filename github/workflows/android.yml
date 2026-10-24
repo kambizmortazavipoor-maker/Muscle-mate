@@ -3,12 +3,6 @@ name: Build MUSCLE MATE APK
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'index.html'
-      - 'manifest.json'
-      - 'sw.js'
-      - '.github/workflows/android.yml'
 
 permissions:
   contents: read
@@ -16,15 +10,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -35,18 +23,20 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Prepare web app
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prepare app
         run: |
           mkdir -p www
           cp index.html manifest.json sw.js www/
-          if [ -f README_FA.md ]; then cp README_FA.md www/; fi
           npm init -y
           npm install @capacitor/core@7 @capacitor/android@7
           npm install --save-dev @capacitor/cli@7
           npx cap init "MUSCLE MATE" com.musclemate.app --web-dir www
-
-      - name: Generate Android project
-        run: npx cap add android
+          npx cap add android
 
       - name: Build APK
         run: |
